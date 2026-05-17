@@ -1,0 +1,10 @@
+Flask
+gunicorn
+pandas
+joblib
+scikit-learn
+numpy
+shap
+tldextract
+requests
+beautifulsoup4
