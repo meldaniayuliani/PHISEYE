@@ -1,0 +1,524 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PhishEye | AI Phishing Detection</title>
+
+<link rel="icon" type="image/png"
+      href="{{ url_for('static', filename='logo.png') }}">
+
+    <!-- GOOGLE FONT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- CHART -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-blur blur1"></div>
+<div class="bg-blur blur2"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+
+    <div class="logo">
+        <span class="logo-icon">🛡️</span>
+        <span>PhishEye</span>
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#checker">Checker</a></li>
+        <li><a href="#faq">FAQ</a></li>
+    </ul>
+
+</nav>
+
+<!-- HERO -->
+<section id="home" class="hero">
+
+    <div class="hero-badge">
+        AI Powered URL Security Detection
+    </div>
+
+    <h1>
+        Detect Phishing URLs <br>
+        Instantly & Securely
+    </h1>
+
+    <p>
+        Analisis URL menggunakan machine learning untuk mendeteksi website phishing,
+        suspicious, dan legitimate secara real-time.
+    </p>
+
+    <div class="hero-buttons">
+
+        <a href="#checker" class="primary-btn">
+            Start Checking
+        </a>
+
+        <a href="#faq" class="secondary-btn">
+            Learn More
+        </a>
+
+    </div>
+
+</section>
+
+<!-- CHECKER -->
+<section id="checker" class="checker-section">
+
+    <div class="checker-card">
+
+        <div class="checker-header">
+            <h2>🔍 URL Security Checker</h2>
+            <p>Masukkan URL website untuk melakukan analisis keamanan</p>
+        </div>
+
+        <form method="POST" class="checker-form">
+
+            <div class="input-wrapper">
+
+                <span class="input-icon">🌐</span>
+
+                <input
+                    type="text"
+                    name="url"
+                    placeholder="https://example.com"
+                    required
+                >
+
+            </div>
+
+            <button type="submit" class="analyze-btn">
+                Analyze URL
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if result %}
+
+    <!-- RESULT -->
+    <div class="result-container">
+
+        <div class="result-card
+
+            {% if result.prediction == 'Phishing' %}
+                danger
+            {% elif result.prediction == 'Suspicious' %}
+                warning
+            {% else %}
+                safe
+            {% endif %}
+        ">
+
+            <!-- ICON -->
+            <div class="result-icon">
+
+                {% if result.prediction == 'Phishing' %}
+                    ⚠️
+                {% elif result.prediction == 'Suspicious' %}
+                    🟡
+                {% else %}
+                    ✅
+                {% endif %}
+
+            </div>
+
+            <!-- TITLE -->
+            <h1>
+
+                {% if result.prediction == 'Phishing' %}
+                    Dangerous Website Detected
+
+                {% elif result.prediction == 'Suspicious' %}
+                    Suspicious Website Detected
+
+                {% else %}
+                    Website Looks Safe
+                {% endif %}
+
+            </h1>
+
+            <!-- DESCRIPTION -->
+            <p class="result-desc">
+
+                {% if result.prediction == 'Phishing' %}
+                    Website terindikasi phishing dan berpotensi mencuri data pengguna.
+
+                {% elif result.prediction == 'Suspicious' %}
+                    Website memiliki pola URL yang mencurigakan dan perlu diwaspadai.
+
+                {% else %}
+                    Website terlihat aman berdasarkan analisis machine learning.
+                {% endif %}
+
+            </p>
+
+            <!-- RISK -->
+            <div class="risk-section">
+
+                <div class="risk-top">
+                    <span>Risk Score</span>
+                    <span>{{ result.risk_score }}%</span>
+                </div>
+
+                <div class="progress-bar">
+
+                    <div
+                        class="progress-fill"
+                        data-width="{{ result.risk_score }}"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <!-- URL -->
+            <div class="url-box">
+                {{ result.highlighted_url | safe }}
+            </div>
+
+            <!-- BUTTON -->
+            <button class="detail-btn" onclick="toggleDetails()">
+                View Detailed Analysis
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- DETAIL -->
+    <div id="detail-box" class="detail-box">
+
+        <!-- URL STRUCTURE -->
+        <div class="detail-card">
+
+            <h3>🌐 URL Structure</h3>
+
+            <div class="grid-info">
+
+                <div class="info-item">
+                    <span>Protocol</span>
+                    <strong>{{ result.url_parts.scheme }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Domain</span>
+                    <strong>{{ result.url_parts.domain }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Path</span>
+                    <strong>{{ result.url_parts.path }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Query</span>
+                    <strong>{{ result.url_parts.query }}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="detail-card">
+
+            <h3>📄 Analysis Summary</h3>
+
+            <div class="summary-box">
+                {{ result.summary }}
+            </div>
+
+        </div>
+
+        <!-- EXPLANATION -->
+        <div class="detail-card">
+
+            <h3>🧠 Prediction Explanation</h3>
+
+            <div class="explanation-list">
+
+                {% for exp in result.explanations %}
+
+                    <div class="explanation-item">
+                        {{ exp }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- SHAP -->
+        <div class="detail-card">
+
+            <h3>📊 SHAP Feature Contribution</h3>
+
+            <canvas id="shapChart"></canvas>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+<!-- INFO -->
+<section class="info-section">
+
+    <div class="info-card">
+
+        <h2>Why URL Security Matters?</h2>
+
+        <p>
+            Serangan phishing sering menyamar sebagai website resmi seperti bank,
+            marketplace, maupun layanan populer lainnya. Sistem ini membantu
+            mengidentifikasi pola URL berbahaya menggunakan machine learning.
+        </p>
+
+    </div>
+
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="faq-section">
+
+ <div class="faq-header">
+
+    <div class="hero-badge">
+        Security Knowledge Base
+    </div>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <p>
+        Pelajari lebih lanjut mengenai phishing detection dan keamanan URL.
+    </p>
+
+</div>
+
+    <div class="faq-container">
+
+        <div class="faq-item">
+
+            <div class="faq-question" onclick="toggleFAQ(this)">
+
+                <span>Apa itu phishing?</span>
+                <span>+</span>
+
+            </div>
+
+            <div class="faq-answer">
+
+                Phishing adalah metode penipuan digital yang digunakan untuk mencuri
+                data sensitif seperti password, OTP, dan informasi kartu kredit
+                melalui website palsu.
+
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+    <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>Bagaimana sistem mendeteksi phishing?</span>
+        <span>+</span>
+    </div>
+
+    <div class="faq-answer">
+        Sistem menggunakan machine learning untuk menganalisis struktur URL,
+        karakter khusus, panjang URL, domain, dan berbagai fitur lainnya
+        untuk menentukan apakah sebuah website berpotensi phishing.
+    </div>
+
+</div>
+
+<div class="faq-item">
+
+    <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>Apakah URL yang aman pasti legitimate?</span>
+        <span>+</span>
+    </div>
+
+    <div class="faq-answer">
+        Tidak selalu. Hasil sistem merupakan prediksi berdasarkan pola data
+        yang dipelajari model machine learning. Tetap diperlukan kewaspadaan
+        pengguna saat membuka website.
+    </div>
+
+</div>
+
+<div class="faq-item">
+
+    <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>Apa itu risk score?</span>
+        <span>+</span>
+    </div>
+
+    <div class="faq-answer">
+        Risk score merupakan nilai probabilitas risiko phishing dalam bentuk
+        persentase. Semakin tinggi nilainya, maka semakin besar kemungkinan
+        URL tersebut berbahaya.
+    </div>
+
+</div>
+
+        <div class="faq-item">
+
+            <div class="faq-question" onclick="toggleFAQ(this)">
+
+                <span>Apakah hasil deteksi selalu akurat?</span>
+                <span>+</span>
+
+            </div>
+
+            <div class="faq-answer">
+
+                Tidak selalu 100% akurat, namun sistem menggunakan machine learning
+                untuk memberikan prediksi berdasarkan pola URL yang telah dipelajari.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 PhishEye — AI Phishing Detection System</p>
+</footer>
+
+<!-- SCRIPT -->
+<script>
+
+function toggleDetails() {
+
+    const box = document.getElementById("detail-box");
+
+    if (box.style.display === "block") {
+
+        box.style.display = "none";
+
+    } else {
+
+        box.style.display = "block";
+
+        setTimeout(() => {
+
+            box.scrollIntoView({
+                behavior: "smooth"
+            });
+
+        }, 100);
+    }
+}
+
+function toggleFAQ(el) {
+
+    const ans = el.nextElementSibling;
+
+    const sym = el.querySelectorAll("span")[1];
+
+    if (ans.style.display === "block") {
+
+        ans.style.display = "none";
+        sym.innerText = "+";
+
+    } else {
+
+        ans.style.display = "block";
+        sym.innerText = "-";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* PROGRESS BAR */
+    const progress = document.querySelector(".progress-fill");
+
+    if(progress){
+
+        const width = progress.getAttribute("data-width");
+
+        progress.style.width = width + "%";
+    }
+
+    /* SHAP CHART */
+    {% if result %}
+
+    const labels = JSON.parse('{{ result.top_features | map(attribute=0) | list | tojson | safe }}');
+
+    const values = JSON.parse('{{ result.top_features | map(attribute=1) | list | tojson | safe }}');
+
+    const ctx = document.getElementById('shapChart');
+
+    if (ctx && labels.length > 0) {
+
+        new Chart(ctx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: labels,
+
+                datasets: [{
+
+                    label: 'Contribution (%)',
+
+                    data: values,
+
+                    borderRadius: 12,
+                    borderSkipped: false
+
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    {% endif %}
+
+});
+
+</script>
+
+</body>
+</html>

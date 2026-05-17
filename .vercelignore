@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment Variables
+.env
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build Files
+build/
+dist/
+
+# Model Files (optional kalau ukuran besar)
+*.pkl
+*.joblib
+
+# Cache
+.cache/
+
+# Vercel
+.vercel/
+
+# Node Modules (kalau ada frontend)
+node_modules/
+
+# Testing
+.pytest_cache/
+
+# Temporary Files
+*.tmp
+*.temp
