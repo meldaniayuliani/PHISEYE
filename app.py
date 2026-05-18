@@ -11,7 +11,7 @@ app = Flask(__name__)
 # =========================
 # LOAD MODEL
 # =========================
-model = joblib.load("model/rf_modelowdataset.pkl")
+model = joblib.load("model/rf_model_compressed.pkl")
 
 feature_names = [
     "url_length","has_ip_address","dot_count","https_flag","url_entropy",
